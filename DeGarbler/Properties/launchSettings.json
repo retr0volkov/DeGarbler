@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "DeGarbler (Package)": {
+      "commandName": "MsixPackage",
+      "commandLineArgs": "\"E:\\Uni\\ЭВМ\\09.03.01 ЭВМ и ПУ\\09.03.01 ╨¡╨Æ╨£ ╨╕ ╨ƒ╨ú\\06_последоват_схемы\""
+    },
+    "DeGarbler (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
