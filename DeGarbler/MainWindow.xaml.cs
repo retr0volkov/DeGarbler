@@ -1,4 +1,4 @@
-using Microsoft.UI;
+﻿using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -34,6 +34,7 @@ namespace DeGarbler
         string[] args = null; 
         string[] folders = null;
         string[] files = null;
+        string[] joined = null;
 
         Dictionary<string, System.Text.Encoding> Codecs = new Dictionary<string, Encoding>()
         {
@@ -68,6 +69,7 @@ namespace DeGarbler
             presenter.IsResizable = false;
 
             Codecs.Add("CP437", System.Text.Encoding.GetEncoding(437));
+            Codecs.Add("CP866", System.Text.Encoding.GetEncoding(866));
             Codecs.Add("Windows-1251", System.Text.Encoding.GetEncoding(1251));
             Codecs.Add("Windows-1252", System.Text.Encoding.GetEncoding(1252));
 
@@ -89,11 +91,18 @@ namespace DeGarbler
             IsReady = true;
 
             args = Environment.GetCommandLineArgs();
+            string path = "C:\\Users\\retrd\\Downloads\\СиТ ИВТ\\СиТ ИВТ";
             try
             {
-                folders = Directory.GetDirectories(args[1]);
-                files = Directory.GetFiles(args[1]);
-                Example.Text = Path.GetFileName(files[0]);
+                folders = Directory.GetDirectories(path);
+                files = Directory.GetFiles(path);
+                joined = folders.Concat(files).ToArray();
+                if (joined.Length < 2)
+                    FileIndexUp.IsEnabled = false;
+                if (joined.Length > 0)
+                    Example.Text = Path.GetFileName(joined[0]);
+                else
+                    Example.Text = "Empty folder";
             }
             catch
             {
@@ -109,7 +118,7 @@ namespace DeGarbler
             if (IsReady)
             {
                 LastUsed = 1;
-                Example.Text = Recode(Path.GetFileName(files[index]), Codecs[(string)Encoding.SelectedItem], Codecs[(string)Decoding.SelectedItem]);
+                Example.Text = Recode(Path.GetFileName(joined[index]), Codecs[(string)Encoding.SelectedItem], Codecs[(string)Decoding.SelectedItem]);
             }
         }
 
@@ -118,7 +127,7 @@ namespace DeGarbler
             if (IsReady)
             {
                 LastUsed = 1;
-                Example.Text = Recode(Path.GetFileName(files[index]), Codecs[(string)Encoding.SelectedItem], Codecs[(string)Decoding.SelectedItem]);
+                Example.Text = Recode(Path.GetFileName(joined[index]), Codecs[(string)Encoding.SelectedItem], Codecs[(string)Decoding.SelectedItem]);
             }
         }
 
@@ -134,7 +143,7 @@ namespace DeGarbler
                 for (int i = 0; i < files.Length; i++)
                     File.Move(files[i], Path.GetDirectoryName(files[i]) + "\\" + Recode(Path.GetFileName(files[i]), Codecs[(string)Encoding.SelectedItem], Codecs[(string)Decoding.SelectedItem]));
                 for (int i = 0; i < folders.Length; i++)
-                    Directory.Move(folders[i], Path.GetDirectoryName(files[i]) + "\\" + Recode(Path.GetFileName(folders[i]), Codecs[(string)Encoding.SelectedItem], Codecs[(string)Decoding.SelectedItem]));
+                    Directory.Move(folders[i], Path.GetDirectoryName(folders[i]) + "\\" + Recode(Path.GetFileName(folders[i]), Codecs[(string)Encoding.SelectedItem], Codecs[(string)Decoding.SelectedItem]));
             }
             else
             {
@@ -153,15 +162,15 @@ namespace DeGarbler
             FileIndexUp.IsEnabled = true;
             if (index == 0)
                 FileIndexDown.IsEnabled = false;
-            Example.Text = Recode(Path.GetFileName(files[--index]), Codecs[(string)Encoding.SelectedItem], Codecs[(string)Decoding.SelectedItem]);
+            Example.Text = Recode(Path.GetFileName(joined[--index]), Codecs[(string)Encoding.SelectedItem], Codecs[(string)Decoding.SelectedItem]);
         }
 
         private void OnClickIndexUp(object sender, RoutedEventArgs e)
         {
             FileIndexDown.IsEnabled = true;
-            if (index == files.Length - 1)
+            if (index == joined.Length - 1)
                 FileIndexUp.IsEnabled= false;
-            Example.Text = Recode(Path.GetFileName(files[++index]), Codecs[(string)Encoding.SelectedItem], Codecs[(string)Decoding.SelectedItem]);
+            Example.Text = Recode(Path.GetFileName(joined[++index]), Codecs[(string)Encoding.SelectedItem], Codecs[(string)Decoding.SelectedItem]);
         }
 
         private string Recode(string text, Encoding encoding, Encoding decoding)
